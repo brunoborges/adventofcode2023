@@ -55,7 +55,6 @@ public class AoC_01 {
             }
         }
 
-
         return fromCodeToNumber(inputCode);
     }
 
