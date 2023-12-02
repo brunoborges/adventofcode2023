@@ -1,6 +1,8 @@
-## Getting Started
+## Advent of Code 2023
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Easiest way is to open this repo on VS Code with Java Extension Pack installed. Then you can run the code by clicking the run button on the top right corner of the editor.
+
+Visit [www.adventofcode.com](https://www.adventofcode.com/) for more information.
 
 ## Folder Structure
 
@@ -9,7 +11,7 @@ The workspace contains two folders by default, where:
 - `src`: the folder to maintain sources
 - `lib`: the folder to maintain dependencies
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+Meanwhile, the compiled output files will be generated in the `bin` folder by default. `bin` folder is ignored by git by default.
 
 > If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
 
