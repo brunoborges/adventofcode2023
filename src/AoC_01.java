@@ -44,7 +44,7 @@ public class AoC_01 {
     // clear (as it often happens in AoC!)
     // and ended up checking on Reddit for tips.
     // But it is hard to see tips without seeing tricks used by others, and this was
-    // the best trick IMO.
+    // the best trick IMO (until I learned about the left/right approach on v2).
 
     public static int fromCodeToNumberPart2(String inputCode) {
         // Run twice to ensure that all words are replaced
