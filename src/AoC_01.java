@@ -57,6 +57,9 @@ public class AoC_01 {
         map.put("eight", "e8ght");
         map.put("nine", "n9ne");
     }
+    // To be honest, I got stuck with Part 2 here because requirements were not clear (as it often happens in AoC!)
+    // and ended up checking on Reddit for tips. 
+    // But it is hard to see tips without seeing tricks used by others, and this was the best trick IMO.
 
     public static int fromCodeToNumberPart2(String inputCode) {
         for (int i = 0; i < 2; i++) {
