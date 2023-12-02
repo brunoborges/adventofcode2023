@@ -8,21 +8,21 @@ public class AoC_01 {
         var lineCount = lines.size();
         System.out.println("Line count: " + lineCount);
 
+        // Part 1
         var sum = 0;
         for (var line : lines) {
             var number = fromCodeToNumber(line);
             sum += number;
         }
-
         System.out.println("Part 1 Sum: " + sum);
 
+        // Part 2
         var sum2 = 0;
         for (var line : lines) {
             var number = fromCodeToNumberPart2(line);
             System.out.println(line + " (word) <---> (number) " + number);
             sum2 += number;
         }
-
         System.out.println("Part 2 Sum: " + sum2);
 
         // get content of the file
@@ -47,59 +47,28 @@ public class AoC_01 {
     static Map<String, String> map = new TreeMap<>();
 
     static {
-        map.put("one", "1");
-        map.put("two", "2");
-        map.put("three", "3");
-        map.put("four", "4");
-        map.put("five", "5");
-        map.put("six", "6");
-        map.put("seven", "7");
-        map.put("eight", "8");
-        map.put("nine", "9");
+        map.put("one", "o1e");
+        map.put("two", "t2o");
+        map.put("three", "thr3e");
+        map.put("four", "f4ur");
+        map.put("five", "f5ve");
+        map.put("six", "s6x");
+        map.put("seven", "se7en");
+        map.put("eight", "e8ght");
+        map.put("nine", "n9ne");
     }
 
     public static int fromCodeToNumberPart2(String inputCode) {
-        int number = 0;
-        String code = inputCode;
-        int pos = 0;
-        int verifiedLength = 3;
-
-        StringBuilder temp = new StringBuilder();
-        while (pos < code.length()) {
-            if (Character.isDigit(code.charAt(pos))) {
-                temp.append(code.charAt(pos));
-                pos++;
-                continue;
-            }
-
-            // else NOT digit, check if it is a word
-            while (verifiedLength <= 5) {
-                if (pos + verifiedLength > code.length()) {
-                    break;
-                }
-                
-                var sub = code.substring(pos, pos + verifiedLength);
-                if (map.containsKey(sub)) {
-                    temp.append(map.get(sub));
-                    pos = pos + verifiedLength;
-                    verifiedLength = 3;
-                    break;
-                } else {
-                    verifiedLength++;
-                }
-            }
-
-            if (verifiedLength == 6) {
-                // not found
-                pos++;
-                verifiedLength = 3;
+        for (int i = 0; i < 2; i++) {
+            for (String key : map.keySet()) {
+                var value = map.get(key);
+                inputCode = inputCode.replaceAll(key, value);
             }
         }
 
-        var clean = temp.toString().replaceAll("[^0-9]", "");
-        var firstAndLastOnly = clean.substring(0, 1) + clean.substring(clean.length() - 1);
-        number = Integer.parseInt(firstAndLastOnly);
-        return number;
+        System.out.println(inputCode);
+
+        return fromCodeToNumber(inputCode);
     }
 
 }
