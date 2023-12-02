@@ -9,27 +9,10 @@ public class AoC_01 {
         System.out.println("Line count: " + lineCount);
 
         // Part 1
-        var sum = 0;
-        for (var line : lines) {
-            var number = fromCodeToNumber(line);
-            sum += number;
-        }
-        System.out.println("Part 1 Sum: " + sum);
+        System.out.println("Part 1 Sum: " + lines.stream().mapToInt(AoC_01_v2::fromCodeToNumber).sum());
 
         // Part 2
-        var sum2 = 0;
-        for (var line : lines) {
-            var number = fromCodeToNumberPart2(line);
-            System.out.println(line + " (word) <---> (number) " + number);
-            sum2 += number;
-        }
-        System.out.println("Part 2 Sum: " + sum2);
-
-        // get content of the file
-        // then filter out the characeters
-        // then find the first and last digit
-        // combine themn as a number
-        // sum all of them up
+        System.out.println("Part 2 Sum: " + lines.stream().mapToInt(AoC_01_v2::fromCodeToNumberPart2).sum());
     }
 
     public static int fromCodeToNumber(String code) {
@@ -57,9 +40,11 @@ public class AoC_01 {
         map.put("eight", "e8ght");
         map.put("nine", "n9ne");
     }
-    // To be honest, I got stuck with Part 2 here because requirements were not clear (as it often happens in AoC!)
-    // and ended up checking on Reddit for tips. 
-    // But it is hard to see tips without seeing tricks used by others, and this was the best trick IMO.
+    // To be honest, I got stuck with Part 2 here because requirements were not
+    // clear (as it often happens in AoC!)
+    // and ended up checking on Reddit for tips.
+    // But it is hard to see tips without seeing tricks used by others, and this was
+    // the best trick IMO.
 
     public static int fromCodeToNumberPart2(String inputCode) {
         // Run twice to ensure that all words are replaced
@@ -70,7 +55,6 @@ public class AoC_01 {
             }
         }
 
-        System.out.println(inputCode);
 
         return fromCodeToNumber(inputCode);
     }
