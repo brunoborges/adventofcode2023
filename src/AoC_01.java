@@ -62,6 +62,7 @@ public class AoC_01 {
     // But it is hard to see tips without seeing tricks used by others, and this was the best trick IMO.
 
     public static int fromCodeToNumberPart2(String inputCode) {
+        // Run twice to ensure that all words are replaced
         for (int i = 0; i < 2; i++) {
             for (String key : map.keySet()) {
                 var value = map.get(key);
