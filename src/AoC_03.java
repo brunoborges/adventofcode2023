@@ -1,15 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AoC_03 {
 
-    String[] symbols = new String[] { ">", "<", "^", "v" };
-
     public static void main(String[] args) {
-        var lines = Utilities.readLines("aoc03_real.txt");
+        var lines = Utilities.readLines("aoc03.txt");
         var lineCount = lines.size();
         System.out.println("Line count: " + lineCount);
 
@@ -18,6 +18,7 @@ public class AoC_03 {
         String nextLine = null;
 
         List<Integer> validNumbers = new ArrayList<>();
+        List<Integer> gearRatios = new ArrayList<>();
 
         for (int i = 0; i < lineCount; i++) {
             var line = lines.get(i);
@@ -31,6 +32,7 @@ public class AoC_03 {
 
             Line parsedLine = new Line(currentLine, previousLine, nextLine);
             validNumbers.addAll(parsedLine.validNumbers);
+            gearRatios.add(parsedLine.sumOfGearRatio);
         }
 
         System.out.println(
@@ -38,27 +40,78 @@ public class AoC_03 {
 
         int sum = validNumbers.stream().mapToInt(Integer::intValue).sum();
         System.out.println("Sum: " + sum);
+
+        // Part 2: print sum of all gear ratios
+        int sumOfGearRatios = gearRatios.stream().mapToInt(Integer::intValue).sum();
+        System.out.println("Sum of all gear ratios: " + sumOfGearRatios);
+
     }
 
     static class Line {
 
         List<Integer> validNumbers = new ArrayList<>();
         int lineLength = -1;
+        int sumOfGearRatio = 0;
+
+        Pattern patternPart1 = Pattern.compile("\\d+");
+        Pattern patternPart2 = Pattern.compile("\\*");
 
         public Line(String input, String previousLine, String nextLine) {
             lineLength = input.length();
-            Pattern pattern = Pattern.compile("\\d+");
-            Matcher matcher = pattern.matcher(input);
+
+            // Part 1
+            Matcher matcher = patternPart1.matcher(input);
+
             // Check all occurrences
             while (matcher.find()) {
-                if (isValidPartNumber(matcher, input, previousLine, nextLine)) {
+                if (isValidPartNumber(matcher, input, previousLine, nextLine))
                     validNumbers.add(Integer.parseInt(matcher.group()));
-                }
+            }
+
+            Matcher matcherPart2 = patternPart2.matcher(input);
+            while (matcherPart2.find()) {
+                sumOfGearRatio += gearRatio(matcherPart2, input, previousLine, nextLine);
+            }
+
+            if (sumOfGearRatio > 0) {
+                System.out.println("Sum of gears' ratios in this line: " + sumOfGearRatio);
             }
         }
 
         private boolean isSymbol(char c) {
             return !Character.isDigit(c) && c != '.';
+        }
+
+        // Matcher here represents the '*' character
+        private int gearRatio(Matcher matcher, String currentLine, String previousLine, String nextLine) {
+            int sindex = matcher.start();
+
+            List<Integer> gearNumbers = new ArrayList<>();
+
+            Stream.of(previousLine, currentLine, nextLine).filter(Objects::nonNull).forEach(line -> {
+                // Use regex to find numbers back agai in the previous line
+                Matcher matcherPart1 = patternPart1.matcher(line);
+
+                while (matcherPart1.find()) {
+                    int msindex = matcherPart1.start();
+                    int meindex = matcherPart1.end();
+
+                    // 1st: number starts/ends, before/at/after * index (previous/next lines)
+                    if (sindex >= msindex && sindex <= meindex) {
+                        gearNumbers.add(Integer.parseInt(matcherPart1.group()));
+                    }
+
+                    // 2nd: number is right before or after the symbol index (same line)
+                    else if (sindex == meindex || sindex + 1 == msindex) {
+                        gearNumbers.add(Integer.parseInt(matcherPart1.group()));
+                    }
+                }
+            });
+
+            System.out.println(
+                    "Gear numbers: " + gearNumbers.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+            var gearRatio = gearNumbers.size() != 2 ? 0 : gearNumbers.stream().reduce(1, Math::multiplyExact);
+            return gearRatio;
         }
 
         private boolean isValidPartNumber(Matcher matcher, String currentLine, String previousLine, String nextLine) {
