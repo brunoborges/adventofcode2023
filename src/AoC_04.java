@@ -31,7 +31,6 @@ public class AoC_04 {
         List<Integer> myNumbers;
         List<Integer> myWinningNumbers;
         int cardPoints = 0;
-        List<Card> copies = new ArrayList<>();
 
         public Card(String input) {
             var parts = input.split(":");
