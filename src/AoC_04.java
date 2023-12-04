@@ -20,8 +20,7 @@ public class AoC_04 {
         pileOfCards.add(card);
 
         for (int i = card.cardNumber; i < card.countWinningNumbers() + card.cardNumber; i++) {
-            var nextCard = originalCards.get(i);
-            processCard(nextCard, originalCards, pileOfCards);
+            processCard(originalCards.get(i), originalCards, pileOfCards);
         }
     }
 
