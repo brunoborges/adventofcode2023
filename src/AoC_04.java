@@ -1,21 +1,32 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class AoC_04 {
     public static void main(String[] args) {
-        var lines = Utilities.readLines("aoc04_example.txt");
+        var lines = Utilities.readLines("aoc04.txt");
         var cards = lines.stream().map(Card::new).toList();
 
         // Part 1
         cards.stream().map(c -> c.cardPoints).reduce(Integer::sum).ifPresent(System.out::println);
 
         // Part 2
-        // TODO
+        var totalPile = new ArrayList<Card>();
+        cards.forEach(c -> processCard(c, cards, totalPile));
+        System.out.println(totalPile.size());
+    }
+
+    static void processCard(Card card, List<Card> originalCards, List<Card> pileOfCards) {
+        pileOfCards.add(card);
+
+        for (int i = card.cardNumber; i < card.countWinningNumbers() + card.cardNumber; i++) {
+            var nextCard = originalCards.get(i);
+            processCard(nextCard, originalCards, pileOfCards);
+        }
     }
 
     static class Card {
+
         int cardNumber;
         List<Integer> winningNumbers;
         List<Integer> myNumbers;
@@ -49,15 +60,5 @@ public class AoC_04 {
             return myWinningNumbers.size();
         }
 
-        @Override
-        public String toString() {
-            return "Card{" +
-                    "cardNumber=" + cardNumber +
-                    ", winningNumbers=" + winningNumbers +
-                    ", myNumbers=" + myNumbers +
-                    ", myWinningNumbers=" + myWinningNumbers +
-                    ", cardPoints=" + cardPoints +
-                    '}';
-        }
     }
 }
