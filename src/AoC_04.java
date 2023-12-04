@@ -19,7 +19,7 @@ public class AoC_04 {
     static void processCard(Card card, List<Card> originalCards, List<Card> pileOfCards) {
         pileOfCards.add(card);
 
-        for (int i = card.cardNumber; i < card.countWinningNumbers() + card.cardNumber; i++) {
+        for (int i = card.cardNumber; i < card.myWinningNumbers.size() + card.cardNumber; i++) {
             processCard(originalCards.get(i), originalCards, pileOfCards);
         }
     }
@@ -53,10 +53,5 @@ public class AoC_04 {
                 }
             }
         }
-
-        public int countWinningNumbers() {
-            return myWinningNumbers.size();
-        }
-
     }
 }
