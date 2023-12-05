@@ -70,20 +70,28 @@ public class AoC_05 {
         Pattern pattern = Pattern.compile("([0-9]+ [0-9]+)");
         var matcher = pattern.matcher(numbers);
 
+        List<String> seedRanges = new ArrayList<String>();
         while (matcher.find()) {
-            var pair = matcher.group().split(" ");
-            var start = Long.parseLong(pair[0]);
-            var range = Long.parseLong(pair[1]);
-
-            for (long i = start; i < start + range; i++) {
-                var seed = new Seed(i);
-                findLocation(seed);
-
-                if (seed.location < lowestLocation) {
-                    lowestLocation = seed.location;
-                }
-            }
+            seedRanges.add(matcher.group());
         }
+
+        lowestLocation = seedRanges.parallelStream()
+                .map(seedRange -> {
+                    var pair = seedRange.split(" ");
+                    var start = Long.parseLong(pair[0]);
+                    var range = Long.parseLong(pair[1]);
+
+                    long thisLowestLocation = Long.MAX_VALUE;
+                    for (long i = start; i < start + range; i++) {
+                        var seed = new Seed(i);
+                        findLocation(seed);
+
+                        if (seed.location < thisLowestLocation) {
+                            thisLowestLocation = seed.location;
+                        }
+                    }
+                    return thisLowestLocation;
+                }).reduce(Math::min).get();
 
         return lowestLocation;
     }
