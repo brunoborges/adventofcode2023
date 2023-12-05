@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -14,13 +13,15 @@ public class AoC_05 {
         new AoC_05();
     }
 
+    private HashMap<Category, List<SourceDestMap>> maps;
+
     public AoC_05() {
         var lines = Utilities.readLines("aoc05.txt");
         System.out.println(lines.size());
 
-        var seeds = Seed.parse(lines.get(0));
+        // Produce maps
+        this.maps = new HashMap<Category, List<SourceDestMap>>();
         var patter = Pattern.compile("([a-z]+\\-to\\-[a-z]+) map:");
-        var maps = new HashMap<Category, List<SourceDestMap>>();
 
         for (int i = 2; i < lines.size(); i++) {
             var matcher = patter.matcher(lines.get(i));
@@ -37,27 +38,79 @@ public class AoC_05 {
             }
         }
 
-        for (final Seed s : seeds.values()) {
-            for (Category cat : Category.values()) {
-                maps.get(cat).stream()
-                        .map(map -> map.findDestination(cat.getSource(s)))
-                        .filter(dest -> !dest.equals(BigInteger.valueOf(-1)))
-                        .findFirst()
-                        .ifPresentOrElse(
-                                dest -> cat.performAction(s, dest),
-                                () -> cat.performAction(s, cat.getSource(s)));
+        var seedsInput = lines.get(0);
+        var seedsPart1 = parseSeedsPart1(seedsInput);
+
+        // Part 1: Find lowest location
+        // Here we can compute all seeds upfront
+        lowestLocation = findLowestLocation(seedsPart1);
+        System.out.println("Lowest location (Part 1): " + lowestLocation);
+
+        // Part 2
+        // Here we need to compute seeds on the fly
+        lowestLocation = parseSeedsAndFindLocationPart2(seedsInput);
+        System.out.println("Lowest location (Part 2): " + lowestLocation);
+    }
+
+    BigInteger lowestLocation = null;
+
+    // Initiate seeds (Part 1)
+    List<Seed> parseSeedsPart1(String line) {
+        return Arrays.asList(line.split(":")[1].trim().split(" ")).stream()
+                .map(String::trim)
+                .map(BigInteger::new)
+                .map(Seed::new)
+                .toList();
+    }
+
+    // Initiate seeds (Part 2)
+    BigInteger parseSeedsAndFindLocationPart2(String line) {
+        var lowestLocation = BigInteger.valueOf(Long.MAX_VALUE);
+
+        String numbers = line.split(":")[1].trim();
+        Pattern pattern = Pattern.compile("([0-9]+ [0-9]+)");
+        var matcher = pattern.matcher(numbers);
+        
+        while (matcher.find()) {
+            var pair = matcher.group().split(" ");
+            var start = new BigInteger(pair[0]);
+            var range = new BigInteger(pair[1]);
+
+            for (BigInteger i = start; i.compareTo(start.add(range)) < 0; i = i.add(BigInteger.ONE)) {
+                var seed = new Seed(i);
+                findLocation(seed);
+
+                if(seed.location.compareTo(lowestLocation) < 0) {
+                    lowestLocation = seed.location;
+                }
             }
+        }
+
+        return lowestLocation;
+    }
+
+    void findLocation(Seed seed) {
+        for (Category cat : Category.values()) {
+            maps.get(cat).stream()
+                    .map(map -> map.findDestination(cat.getSource(seed)))
+                    .filter(dest -> !dest.equals(BigInteger.valueOf(-1)))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            dest -> cat.performAction(seed, dest),
+                            () -> cat.performAction(seed, cat.getSource(seed)));
+        }
+    }
+
+    BigInteger findLowestLocation(List<Seed> seeds) {
+        for (final Seed s : seeds) {
+            findLocation(s);
             System.out.println(s);
         }
 
-        // Part 1: Find lowest location
-        var lowestLocation = seeds.values().stream().map(s -> s.location).reduce(BigInteger::min).get();
-        System.out.println("Lowest location: " + lowestLocation);
-
-        // Part 2
+        return seeds.stream().map(s -> s.location).reduce(BigInteger::min).get();
     }
 
-    static class Seed {
+    class Seed {
 
         Seed(BigInteger number) {
             this.number = number;
@@ -71,15 +124,6 @@ public class AoC_05 {
         BigInteger temperature;
         BigInteger humidity;
         BigInteger location;
-
-        // Initiate seeds
-        static Map<BigInteger, Seed> parse(String line) {
-            return Arrays.asList(line.split(":")[1].trim().split(" ")).stream()
-                    .map(String::trim)
-                    .map(BigInteger::new)
-                    .map(Seed::new)
-                    .collect(HashMap::new, (map, seed) -> map.put(seed.number, seed), HashMap::putAll);
-        }
 
         @Override
         public String toString() {
