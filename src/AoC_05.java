@@ -1,4 +1,3 @@
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,35 +51,35 @@ public class AoC_05 {
         System.out.println("Lowest location (Part 2): " + lowestLocation);
     }
 
-    BigInteger lowestLocation = null;
+    long lowestLocation = Long.MAX_VALUE;
 
     // Initiate seeds (Part 1)
     List<Seed> parseSeedsPart1(String line) {
         return Arrays.asList(line.split(":")[1].trim().split(" ")).stream()
                 .map(String::trim)
-                .map(BigInteger::new)
+                .map(Long::parseLong)
                 .map(Seed::new)
                 .toList();
     }
 
     // Initiate seeds (Part 2)
-    BigInteger parseSeedsAndFindLocationPart2(String line) {
-        var lowestLocation = BigInteger.valueOf(Long.MAX_VALUE);
+    long parseSeedsAndFindLocationPart2(String line) {
+        var lowestLocation = Long.MAX_VALUE;
 
         String numbers = line.split(":")[1].trim();
         Pattern pattern = Pattern.compile("([0-9]+ [0-9]+)");
         var matcher = pattern.matcher(numbers);
-        
+
         while (matcher.find()) {
             var pair = matcher.group().split(" ");
-            var start = new BigInteger(pair[0]);
-            var range = new BigInteger(pair[1]);
+            var start = Long.parseLong(pair[0]);
+            var range = Long.parseLong(pair[1]);
 
-            for (BigInteger i = start; i.compareTo(start.add(range)) < 0; i = i.add(BigInteger.ONE)) {
+            for (long i = start; i < start + range; i++) {
                 var seed = new Seed(i);
                 findLocation(seed);
 
-                if(seed.location.compareTo(lowestLocation) < 0) {
+                if (seed.location < lowestLocation) {
                     lowestLocation = seed.location;
                 }
             }
@@ -93,7 +92,7 @@ public class AoC_05 {
         for (Category cat : Category.values()) {
             maps.get(cat).stream()
                     .map(map -> map.findDestination(cat.getSource(seed)))
-                    .filter(dest -> !dest.equals(BigInteger.valueOf(-1)))
+                    .filter(dest -> dest != -1)
                     .findFirst()
                     .ifPresentOrElse(
                             dest -> cat.performAction(seed, dest),
@@ -101,29 +100,29 @@ public class AoC_05 {
         }
     }
 
-    BigInteger findLowestLocation(List<Seed> seeds) {
+    Long findLowestLocation(List<Seed> seeds) {
         for (final Seed s : seeds) {
             findLocation(s);
             System.out.println(s);
         }
 
-        return seeds.stream().map(s -> s.location).reduce(BigInteger::min).get();
+        return seeds.stream().map(s -> s.location).reduce(Math::min).get();
     }
 
     class Seed {
 
-        Seed(BigInteger number) {
+        Seed(long number) {
             this.number = number;
         }
 
-        BigInteger number;
-        BigInteger soil;
-        BigInteger fertilizer;
-        BigInteger water;
-        BigInteger light;
-        BigInteger temperature;
-        BigInteger humidity;
-        BigInteger location;
+        long number;
+        long soil;
+        long fertilizer;
+        long water;
+        long light;
+        long temperature;
+        long humidity;
+        long location;
 
         @Override
         public String toString() {
@@ -134,21 +133,21 @@ public class AoC_05 {
 
     }
 
-    record SourceDestMap(BigInteger sourceRangeStart, BigInteger destinationRangeStart, BigInteger rangeLength) {
+    record SourceDestMap(long sourceRangeStart, long destinationRangeStart, long rangeLength) {
         static SourceDestMap parseRange(String line) {
             var parts = line.split(" ");
-            BigInteger destinationRangeStart = new BigInteger(parts[0]);
-            BigInteger sourceRangeStart = new BigInteger(parts[1]);
-            BigInteger rangeLength = new BigInteger(parts[2]);
+            long destinationRangeStart = Long.parseLong(parts[0]);
+            long sourceRangeStart = Long.parseLong(parts[1]);
+            long rangeLength = Long.parseLong(parts[2]);
 
             return new SourceDestMap(sourceRangeStart, destinationRangeStart, rangeLength);
         }
 
-        BigInteger findDestination(BigInteger source) {
-            if (source.compareTo(sourceRangeStart) >= 0 && source.compareTo(sourceRangeStart.add(rangeLength)) < 0) {
-                return destinationRangeStart.add(source.subtract(sourceRangeStart));
+        long findDestination(long source) {
+            if (source >= sourceRangeStart && source < sourceRangeStart + rangeLength) {
+                return destinationRangeStart + source - sourceRangeStart;
             } else {
-                return BigInteger.valueOf(-1); // not in this particular range
+                return -1; // not in this particular range
             }
         }
     }
@@ -162,19 +161,19 @@ public class AoC_05 {
         temperature_to_humidity((s) -> s.temperature, (s, humidity) -> s.humidity = humidity),
         humidity_to_location((s) -> s.humidity, (s, location) -> s.location = location);
 
-        private BiConsumer<Seed, BigInteger> action;
-        private Function<Seed, BigInteger> getSource;
+        private BiConsumer<Seed, Long> action;
+        private Function<Seed, Long> getSource;
 
-        Category(Function<Seed, BigInteger> getSource, BiConsumer<Seed, BigInteger> action) {
+        Category(Function<Seed, Long> getSource, BiConsumer<Seed, Long> action) {
             this.action = action;
             this.getSource = getSource;
         }
 
-        public BigInteger getSource(Seed seed) {
+        public Long getSource(Seed seed) {
             return getSource.apply(seed);
         }
 
-        public void performAction(Seed seed, BigInteger value) {
+        public void performAction(Seed seed, Long value) {
             if (action != null) {
                 action.accept(seed, value);
             }
