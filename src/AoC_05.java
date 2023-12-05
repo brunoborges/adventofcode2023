@@ -50,13 +50,9 @@ public class AoC_05 {
             System.out.println(s);
         }
 
-        // Find lowest location
+        // Part 1: Find lowest location
         var lowestLocation = seeds.values().stream().map(s -> s.location).reduce(BigInteger::min).get();
         System.out.println("Lowest location: " + lowestLocation);
-
-        // System.out.println(maps);
-
-        // Part 1
 
         // Part 2
     }
